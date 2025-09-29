@@ -11,6 +11,8 @@ eval "$(/opt/homebrew/bin/brew shellenv)"
 
 # installing miniconda
 brew install --cask miniconda
+conda init bash
+conda init zsh
 
 # setting up github
 current_name="$(git config --global user.name || true)"
