@@ -67,7 +67,17 @@ success_symbol = '[➜](bold green)' # The 'success_symbol' segment is being set
 [package]
 disabled = true
 TOML
-
 grep -q 'starship init zsh' ~/.zshrc || echo 'eval "$(starship init zsh)"' >> ~/.zshrc
 . ~/.zshrc
+
+# NEOVIM
+export NONINTERACTIVE=1 HOMEBREW_NO_ANALYTICS=1 HOMEBREW_NO_ENV_HINTS=1
+brew install neovim
+echo 'alias vim="nvim"' >> ~/.zshrc
+echo 'alias vi="nvim"'  >> ~/.zshrc
+echo 'export EDITOR="nvim"'  >> ~/.zshrc
+echo 'export VISUAL="nvim"'  >> ~/.zshrc
+. ~/.zshrc
+git config --global core.editor "nvim"
+
 
