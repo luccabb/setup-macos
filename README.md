@@ -11,3 +11,4 @@ git clone git@github.com:luccabb/setup-macos.git
 - sets up github: [`gh` CLI](https://github.com/cli/cli), creates and uploads an ssh key for you new mac to your git account
 - installs [starship](https://starship.rs/)
 - installs [neovim](https://neovim.io/) and sets it as the default editor
+- installs [uv](https://docs.astral.sh/uv/)

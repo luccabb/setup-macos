@@ -80,4 +80,7 @@ echo 'export VISUAL="nvim"'  >> ~/.zshrc
 . ~/.zshrc
 git config --global core.editor "nvim"
 
+# uv
+curl -LsSf https://astral.sh/uv/install.sh | sh
+source $HOME/.local/bin/env
 
