@@ -84,3 +84,6 @@ git config --global core.editor "nvim"
 curl -LsSf https://astral.sh/uv/install.sh | sh
 source $HOME/.local/bin/env
 
+# macos system settings
+defaults write com.apple.spotlight CalculationEnabled -bool YES
+
