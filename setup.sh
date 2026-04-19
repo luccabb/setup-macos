@@ -1,7 +1,9 @@
 #!/usr/bin/env bash
-set -uo pipefail
+set -euo pipefail
 
 log() { echo "==> $*"; }
+
+export NONINTERACTIVE=1 HOMEBREW_NO_ANALYTICS=1 HOMEBREW_NO_ENV_HINTS=1
 
 # cache sudo credentials and keep them alive for the duration of the script
 log "Caching sudo credentials"
@@ -111,9 +113,14 @@ else
   log "SSH config already set, skipping"
 fi
 
-log "Installing gh"
-brew install gh
-gh config set git_protocol ssh
+log "Checking gh"
+if ! command -v gh &>/dev/null; then
+  log "Installing gh"
+  brew install gh
+else
+  log "gh already installed, skipping"
+fi
+gh config set git_protocol ssh || true
 git config --global pull.rebase false
 
 log "Checking GitHub auth"
@@ -133,8 +140,9 @@ else
   log "Starship already installed, skipping"
 fi
 
-mkdir -p ~/.config && touch ~/.config/starship.toml
-cat > ~/.config/starship.toml <<'TOML'
+mkdir -p ~/.config
+if [ ! -f ~/.config/starship.toml ]; then
+  cat > ~/.config/starship.toml <<'TOML'
 "$schema" = 'https://starship.rs/config-schema.json'
 
 add_newline = true
@@ -145,17 +153,39 @@ success_symbol = '[➜](bold green)'
 [package]
 disabled = true
 TOML
+fi
 grep -q 'starship init zsh' ~/.zshrc || echo 'eval "$(starship init zsh)"' >> ~/.zshrc
 
 # NEOVIM
-log "Installing Neovim"
-export NONINTERACTIVE=1 HOMEBREW_NO_ANALYTICS=1 HOMEBREW_NO_ENV_HINTS=1
-brew install neovim
+log "Checking Neovim"
+if ! command -v nvim &>/dev/null; then
+  log "Installing Neovim"
+  brew install neovim
+else
+  log "Neovim already installed, skipping"
+fi
 grep -q 'alias vim="nvim"' ~/.zshrc || echo 'alias vim="nvim"' >> ~/.zshrc
 grep -q 'alias vi="nvim"'  ~/.zshrc || echo 'alias vi="nvim"'  >> ~/.zshrc
 grep -q 'EDITOR="nvim"'    ~/.zshrc || echo 'export EDITOR="nvim"' >> ~/.zshrc
 grep -q 'VISUAL="nvim"'    ~/.zshrc || echo 'export VISUAL="nvim"' >> ~/.zshrc
 git config --global core.editor "nvim"
+
+# node + codex
+log "Checking node"
+if ! command -v node &>/dev/null; then
+  log "Installing node"
+  brew install node
+else
+  log "node already installed, skipping"
+fi
+
+log "Checking codex"
+if ! command -v codex &>/dev/null; then
+  log "Installing codex"
+  npm install -g @openai/codex
+else
+  log "codex already installed, skipping"
+fi
 
 # uv
 log "Checking uv"
@@ -182,20 +212,24 @@ defaults write -g InitialKeyRepeat -int 10
 defaults write -g KeyRepeat -int 1
 /usr/bin/hidutil property --set '{"CapsLockDelayOverride": 0}'
 
-# dock
-log "Configuring Dock"
-brew install dockutil || true
-dockutil --add /Applications/Obsidian.app --no-restart || true
-dockutil --add "/Applications/Visual Studio Code.app" --no-restart || true
-dockutil --add "/Applications/Google Chrome.app" --no-restart || true
-dockutil --add /Applications/iTerm.app --no-restart || true
-killall Dock
-
 # chrome as default browser
 log "Installing Google Chrome"
 brew_cask_install google-chrome
 log "Setting Chrome as default browser"
-brew install defaultbrowser || true
+if ! command -v defaultbrowser &>/dev/null; then
+  brew install defaultbrowser
+fi
 defaultbrowser chrome || true
+
+# dock
+log "Configuring Dock"
+if ! command -v dockutil &>/dev/null; then
+  brew install dockutil
+fi
+dockutil --add /Applications/Obsidian.app --no-restart || true
+dockutil --add "/Applications/Visual Studio Code.app" --no-restart || true
+dockutil --add "/Applications/Google Chrome.app" --no-restart || true
+dockutil --add "/Applications/iTerm.app" --no-restart || true
+killall Dock
 
 log "Done!"
